@@ -160,8 +160,8 @@ export default function HomePage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connection line */}
-            <div className="hidden md:block absolute top-24 left-1/4 right-1/4 h-0.5 bg-gradient-to-r from-primary/20 via-primary to-primary/20" />
+            {/* Connection line - spans between all step circles */}
+            <div className="hidden md:block absolute top-8 left-[16.67%] right-[16.67%] h-0.5 bg-gradient-to-r from-primary via-primary to-primary" />
             
             {[
               {
