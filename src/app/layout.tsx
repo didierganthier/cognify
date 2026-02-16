@@ -7,10 +7,75 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_APP_URL || "https://cognify-swart.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Cognify - Turn PDFs into Interactive Study Experiences",
-  description: "Upload any document and get instant AI summaries, quizzes, and audio — everything you need to master any material, fast.",
-  keywords: ["study", "learning", "AI", "PDF", "quiz", "summary", "education"],
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Cognify - Turn PDFs into Interactive Study Experiences",
+    template: "%s | Cognify",
+  },
+  description: "Upload any PDF or web page and get instant AI summaries, quizzes, and audio — everything you need to master any material, fast.",
+  keywords: [
+    "study",
+    "learning",
+    "AI",
+    "PDF",
+    "quiz",
+    "summary",
+    "education",
+    "flashcards",
+    "audio learning",
+    "AI tutor",
+    "document analysis",
+    "study guide",
+    "exam prep",
+  ],
+  authors: [{ name: "Cognify" }],
+  creator: "Cognify",
+  publisher: "Cognify",
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
+  manifest: "/manifest.json",
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: siteUrl,
+    siteName: "Cognify",
+    title: "Cognify - Turn PDFs into Interactive Study Experiences",
+    description: "Upload any PDF or web page and get instant AI summaries, quizzes, and audio — everything you need to master any material, fast.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Cognify - AI-Powered Learning Platform",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Cognify - Turn PDFs into Interactive Study Experiences",
+    description: "Upload any PDF or web page and get instant AI summaries, quizzes, and audio — master any material, fast.",
+    images: ["/og-image.png"],
+    creator: "@cognifyapp",
+  },
+  category: "Education",
 };
 
 export default function RootLayout({
