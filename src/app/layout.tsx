@@ -49,7 +49,7 @@ export const metadata: Metadata = {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
     ],
-    apple: "/apple-touch-icon.png",
+    apple: "/apple-icon",
   },
   manifest: "/manifest.json",
   openGraph: {
@@ -61,7 +61,7 @@ export const metadata: Metadata = {
     description: "Upload any PDF or web page and get instant AI summaries, quizzes, and audio — everything you need to master any material, fast.",
     images: [
       {
-        url: "/og-image.png",
+        url: `${siteUrl}/opengraph-image`,
         width: 1200,
         height: 630,
         alt: "Cognify - AI-Powered Learning Platform",
@@ -72,7 +72,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Cognify - Turn PDFs into Interactive Study Experiences",
     description: "Upload any PDF or web page and get instant AI summaries, quizzes, and audio — master any material, fast.",
-    images: ["/og-image.png"],
+    images: [`${siteUrl}/twitter-image`],
     creator: "@cognifyapp",
   },
   category: "Education",
