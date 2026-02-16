@@ -87,9 +87,9 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-8 max-w-3xl">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold flex items-center gap-2">
+          <h1 className="text-2xl sm:text-3xl font-bold flex items-center gap-2">
             Notifications
             {unreadCount > 0 && (
               <Badge variant="destructive">{unreadCount}</Badge>
@@ -106,13 +106,13 @@ export default function NotificationsPage() {
             onClick={markAllAsRead}
             disabled={unreadCount === 0}
           >
-            <Check className="h-4 w-4 mr-2" />
-            Mark all read
+            <Check className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Mark all read</span>
           </Button>
           <Link href="/dashboard/settings">
             <Button variant="outline" size="sm">
-              <Settings className="h-4 w-4 mr-2" />
-              Settings
+              <Settings className="h-4 w-4 sm:mr-2" />
+              <span className="hidden sm:inline">Settings</span>
             </Button>
           </Link>
         </div>

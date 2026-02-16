@@ -36,7 +36,7 @@ export function DashboardHeader({ user }: DashboardHeaderProps) {
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-sm px-6">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b bg-background/80 backdrop-blur-sm px-4 sm:px-6 pl-14 lg:pl-6">
       <div>
         {/* Empty - welcome moved to page */}
       </div>

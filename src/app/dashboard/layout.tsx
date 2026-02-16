@@ -22,9 +22,9 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-muted/30">
       <Sidebar />
-      <div className="ml-64">
+      <div className="lg:ml-64">
         <DashboardHeader user={{ email: user.email || '' }} />
-        <main className="p-6">
+        <main className="p-4 sm:p-6 pt-16 lg:pt-6">
           {!isEmailVerified && <VerificationBanner email={user.email || ''} />}
           {children}
         </main>

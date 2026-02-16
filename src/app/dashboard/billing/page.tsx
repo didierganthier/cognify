@@ -164,7 +164,7 @@ export default function BillingPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Billing</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold">Billing</h1>
         <p className="text-muted-foreground mt-1">
           Manage your subscription and billing details
         </p>
@@ -258,12 +258,12 @@ export default function BillingPage() {
       {/* Plans */}
       {currentPlan === 'free' && (
         <div>
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <h2 className="text-xl font-semibold">Choose Your Plan</h2>
-            <div className="flex items-center gap-2 p-1 bg-muted rounded-lg">
+            <div className="flex items-center gap-1 sm:gap-2 p-1 bg-muted rounded-lg overflow-x-auto">
               <button
                 onClick={() => setBillingPeriod('monthly')}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap ${
                   billingPeriod === 'monthly' 
                     ? 'bg-background shadow text-foreground' 
                     : 'text-muted-foreground hover:text-foreground'
@@ -273,29 +273,29 @@ export default function BillingPage() {
               </button>
               <button
                 onClick={() => setBillingPeriod('yearly')}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap ${
                   billingPeriod === 'yearly' 
                     ? 'bg-background shadow text-foreground' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Yearly
-                <Badge variant="secondary" className="ml-1 text-xs">-30%</Badge>
+                <Badge variant="secondary" className="ml-1 text-xs hidden sm:inline">-30%</Badge>
               </button>
               <button
                 onClick={() => setBillingPeriod('lifetime')}
-                className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                className={`px-2 sm:px-3 py-1 text-xs sm:text-sm rounded-md transition-colors whitespace-nowrap ${
                   billingPeriod === 'lifetime' 
                     ? 'bg-background shadow text-foreground' 
                     : 'text-muted-foreground hover:text-foreground'
                 }`}
               >
                 Lifetime
-                <Badge variant="secondary" className="ml-1 text-xs bg-green-100 text-green-700">Best</Badge>
+                <Badge variant="secondary" className="ml-1 text-xs bg-green-100 text-green-700 hidden sm:inline">Best</Badge>
               </button>
             </div>
           </div>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid sm:grid-cols-2 gap-6">
             {plans.map((plan) => (
               <Card 
                 key={plan.name} 

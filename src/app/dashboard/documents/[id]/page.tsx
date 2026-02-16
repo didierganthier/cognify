@@ -41,7 +41,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">{document.title}</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold break-words">{document.title}</h1>
         <p className="text-muted-foreground mt-1">
           Uploaded on {new Date(document.created_at).toLocaleDateString()}
         </p>

@@ -56,16 +56,16 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-8">
       {/* Welcome Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">
+          <h1 className="text-2xl sm:text-3xl font-bold">
             Welcome back, <span className="text-primary">{firstName}</span>! 👋
           </h1>
           <p className="text-muted-foreground mt-1">
             Here&apos;s an overview of your study materials.
           </p>
         </div>
-        <Button asChild className="shadow-md">
+        <Button asChild className="shadow-md w-full sm:w-auto">
           <Link href="/dashboard/upload">
             <Plus className="mr-2 h-4 w-4" />
             Upload PDF
@@ -74,7 +74,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid gap-4 md:grid-cols-4">
+      <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
         <Card className="hover:shadow-md transition-shadow">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Total Documents</CardTitle>
