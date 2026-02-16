@@ -14,7 +14,6 @@ if (!secretKey) {
 }
 
 export const stripe = new Stripe(secretKey, {
-  apiVersion: '2026-01-28.clover',
   typescript: true,
 });
 
