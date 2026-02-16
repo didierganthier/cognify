@@ -35,6 +35,47 @@ export default function BillingPage() {
     loadProfile()
   }, [])
 
+  // Refresh data when returning from successful checkout
+  useEffect(() => {
+    if (success) {
+      // Poll for profile update (webhook may take a moment)
+      const pollProfile = async () => {
+        let attempts = 0
+        const maxAttempts = 10
+        
+        const poll = async () => {
+          const supabase = createClient()
+          const { data: { user } } = await supabase.auth.getUser()
+          
+          if (user) {
+            const { data: profileData } = await supabase
+              .from('profiles')
+              .select('subscription_status, current_period_end, stripe_customer_id')
+              .eq('id', user.id)
+              .single()
+            
+            if (profileData?.subscription_status === 'active' || profileData?.subscription_status === 'lifetime') {
+              setProfile(profileData as Profile)
+              setLoading(false)
+              return
+            }
+          }
+          
+          attempts++
+          if (attempts < maxAttempts) {
+            setTimeout(poll, 1000) // Poll every second
+          } else {
+            setLoading(false)
+          }
+        }
+        
+        poll()
+      }
+      
+      pollProfile()
+    }
+  }, [success])
+
   async function loadProfile() {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
