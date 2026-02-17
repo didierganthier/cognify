@@ -5,7 +5,8 @@ import { SummaryTab } from './summary-tab';
 import { QuizTab } from './quiz-tab';
 import { AudioTab } from './audio-tab';
 import { ResultsTab } from './results-tab';
-import { FileText, ClipboardCheck, Headphones, BarChart3 } from 'lucide-react';
+import { FlashcardsTab } from './flashcards-tab';
+import { FileText, ClipboardCheck, Headphones, BarChart3, Brain } from 'lucide-react';
 
 interface StudyPackTabsProps {
   document: {
@@ -30,6 +31,12 @@ interface StudyPackTabsProps {
       correct_answer: number;
     }>;
   } | null;
+  flashcards: Array<{
+    id: string;
+    front: string;
+    back: string;
+    mastery_level: number;
+  }> | null;
   attempts: Array<{
     id: string;
     score: number;
@@ -38,7 +45,7 @@ interface StudyPackTabsProps {
   }>;
 }
 
-export function StudyPackTabs({ document, summary, quiz, attempts }: StudyPackTabsProps) {
+export function StudyPackTabs({ document, summary, quiz, flashcards, attempts }: StudyPackTabsProps) {
   if (document.status === 'processing') {
     return (
       <div className="text-center py-20">
@@ -59,10 +66,14 @@ export function StudyPackTabs({ document, summary, quiz, attempts }: StudyPackTa
 
   return (
     <Tabs defaultValue="summary" className="w-full">
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="grid w-full grid-cols-5">
         <TabsTrigger value="summary" className="flex items-center gap-2">
           <FileText className="h-4 w-4" />
           <span className="hidden sm:inline">Summary</span>
+        </TabsTrigger>
+        <TabsTrigger value="flashcards" className="flex items-center gap-2">
+          <Brain className="h-4 w-4" />
+          <span className="hidden sm:inline">Cards</span>
         </TabsTrigger>
         <TabsTrigger value="quiz" className="flex items-center gap-2">
           <ClipboardCheck className="h-4 w-4" />
@@ -80,6 +91,10 @@ export function StudyPackTabs({ document, summary, quiz, attempts }: StudyPackTa
 
       <TabsContent value="summary" className="mt-6">
         <SummaryTab summary={summary} />
+      </TabsContent>
+
+      <TabsContent value="flashcards" className="mt-6">
+        <FlashcardsTab documentId={document.id} flashcards={flashcards} />
       </TabsContent>
 
       <TabsContent value="quiz" className="mt-6">

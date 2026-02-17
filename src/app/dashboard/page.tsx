@@ -17,25 +17,55 @@ import {
   Headphones,
   ClipboardCheck
 } from 'lucide-react';
+import { StudyStreak } from '@/components/dashboard/study-streak';
 
 export default async function DashboardPage() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
-  // TODO: Fetch real data from Supabase
+  // Fetch profile for streak data
+  const { data: profile } = await supabase
+    .from('profiles')
+    .select('current_streak, longest_streak, last_study_date, subscription_status')
+    .eq('id', user?.id)
+    .single();
+
+  // Fetch documents count
+  const { count: documentsCount } = await supabase
+    .from('documents')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user?.id);
+
+  // Fetch quiz attempts
+  const { data: quizAttempts } = await supabase
+    .from('quiz_attempts')
+    .select('score, total_questions')
+    .eq('user_id', user?.id);
+
+  // Calculate stats
+  const completedQuizzes = quizAttempts?.length || 0;
+  const averageScore = completedQuizzes > 0 
+    ? Math.round(quizAttempts!.reduce((acc, a) => acc + (a.score / a.total_questions) * 100, 0) / completedQuizzes)
+    : 0;
+
+  const isPro = profile?.subscription_status === 'active' || profile?.subscription_status === 'lifetime';
+
   const stats = {
-    totalDocuments: 0,
-    completedQuizzes: 0,
-    averageScore: 0,
-    remainingUploads: 3,
+    totalDocuments: documentsCount || 0,
+    completedQuizzes,
+    averageScore,
+    remainingUploads: isPro ? '∞' : Math.max(0, 3 - (documentsCount || 0)),
   };
 
-  const recentDocuments: Array<{
-    id: string;
-    title: string;
-    status: 'processing' | 'completed' | 'failed';
-    created_at: string;
-  }> = [];
+  // Fetch recent documents
+  const { data: recentDocs } = await supabase
+    .from('documents')
+    .select('id, title, status, created_at')
+    .eq('user_id', user?.id)
+    .order('created_at', { ascending: false })
+    .limit(5);
+
+  const recentDocuments = recentDocs || [];
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -72,6 +102,13 @@ export default async function DashboardPage() {
           </Link>
         </Button>
       </div>
+
+      {/* Study Streak */}
+      <StudyStreak 
+        initialStreak={profile?.current_streak || 0}
+        longestStreak={profile?.longest_streak || 0}
+        lastStudyDate={profile?.last_study_date}
+      />
 
       {/* Stats Grid */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
@@ -116,13 +153,13 @@ export default async function DashboardPage() {
 
         <Card className="hover:shadow-md transition-shadow border-primary/20 bg-linear-to-br from-primary/5 to-transparent">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Free Uploads</CardTitle>
-            <Badge variant="secondary">{stats.remainingUploads}/3</Badge>
+            <CardTitle className="text-sm font-medium">{isPro ? 'Plan' : 'Free Uploads'}</CardTitle>
+            <Badge variant="secondary">{isPro ? 'Pro' : `${stats.remainingUploads}/3`}</Badge>
           </CardHeader>
           <CardContent>
-            <div className="text-3xl font-bold text-primary">{stats.remainingUploads}</div>
-            <Progress value={(stats.remainingUploads / 3) * 100} className="mt-2 h-1.5" />
-            <p className="text-xs text-muted-foreground mt-2">Remaining this month</p>
+            <div className="text-3xl font-bold text-primary">{isPro ? '∞' : stats.remainingUploads}</div>
+            {!isPro && <Progress value={(Number(stats.remainingUploads) / 3) * 100} className="mt-2 h-1.5" />}
+            <p className="text-xs text-muted-foreground mt-2">{isPro ? 'Unlimited uploads' : 'Remaining this month'}</p>
           </CardContent>
         </Card>
       </div>

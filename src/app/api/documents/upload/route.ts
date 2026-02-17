@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { extractTextFromPDF, formatTextForSummary } from '@/lib/pdf';
-import { generateSummary, generateQuiz, generateAudio } from '@/lib/openai';
+import { generateSummary, generateQuiz, generateAudio, generateFlashcards } from '@/lib/openai';
 import { extractWebPageContent, isPdfUrl, getPageNameFromUrl } from '@/lib/scraper';
 
 // Fetch PDF from URL
@@ -242,6 +242,28 @@ export async function POST(request: NextRequest) {
           document_id: document.id,
           questions: quizData.questions,
         });
+
+      // Generate and save flashcards
+      const flashcardsData = await generateFlashcards(
+        text, 
+        summaryData.definitions || [], 
+        summaryData.key_concepts || []
+      );
+
+      // Insert flashcards
+      if (flashcardsData.length > 0) {
+        await supabase
+          .from('flashcards')
+          .insert(
+            flashcardsData.map((card: { front: string; back: string }) => ({
+              document_id: document.id,
+              user_id: user.id,
+              front: card.front,
+              back: card.back,
+              mastery_level: 0,
+            }))
+          );
+      }
 
       // Update document status
       await supabase

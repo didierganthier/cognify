@@ -32,6 +32,12 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
     .eq('document_id', id)
     .single();
 
+  const { data: flashcards } = await supabase
+    .from('flashcards')
+    .select('id, front, back, mastery_level')
+    .eq('document_id', id)
+    .order('created_at', { ascending: true });
+
   const { data: attempts } = await supabase
     .from('quiz_attempts')
     .select('*')
@@ -51,6 +57,7 @@ export default async function DocumentPage({ params }: DocumentPageProps) {
         document={document}
         summary={summary}
         quiz={quiz}
+        flashcards={flashcards}
         attempts={attempts || []}
       />
     </div>

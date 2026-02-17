@@ -60,6 +60,44 @@ export async function generateQuiz(text: string, summary: string) {
   return result.questions || [];
 }
 
+export async function generateFlashcards(text: string, definitions: Array<{ term: string; definition: string }>, keyConcepts: string[]) {
+  // Create flashcards from definitions
+  const definitionCards = definitions.map(def => ({
+    front: `What is "${def.term}"?`,
+    back: def.definition
+  }));
+
+  // Generate additional concept-based flashcards using AI
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o-mini',
+    messages: [
+      {
+        role: 'system',
+        content: `You are an expert flashcard creator. Based on the text and key concepts, create 5-10 flashcards that will help a student learn and retain the material.
+        
+        Return JSON with a "flashcards" array where each flashcard has:
+        - front: A question or prompt (keep it concise)
+        - back: The answer or explanation (keep it clear and memorable)
+        
+        Focus on important facts, relationships, and concepts. Make them Anki-style (short, focused, one concept per card).
+        Return ONLY valid JSON.`
+      },
+      {
+        role: 'user',
+        content: `Text:\n${text.substring(0, 3000)}\n\nKey Concepts:\n${keyConcepts.join(', ')}`
+      }
+    ],
+    response_format: { type: 'json_object' },
+    max_tokens: 1500,
+  });
+
+  const result = JSON.parse(response.choices[0].message.content || '{}');
+  const aiCards = result.flashcards || [];
+
+  // Combine definition cards with AI-generated cards
+  return [...definitionCards, ...aiCards];
+}
+
 export async function generateAudio(text: string): Promise<Buffer> {
   const response = await openai.audio.speech.create({
     model: 'tts-1',
