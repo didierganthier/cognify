@@ -200,16 +200,25 @@ export async function POST(request: NextRequest) {
         text = formatTextForSummary(rawText);
       }
       // For web pages, text is already extracted above
+      
+      console.log(`[Document ${document.id}] Text extracted, length: ${text.length} chars`);
 
       // Generate summary
       const summaryData = await generateSummary(text);
+      console.log(`[Document ${document.id}] Summary generated:`, {
+        hasTldr: !!summaryData.tldr,
+        keyConceptsCount: summaryData.key_concepts?.length || 0,
+        definitionsCount: summaryData.definitions?.length || 0,
+      });
 
       // Generate quiz
-      const quizData = await generateQuiz(text, summaryData.tldr);
+      const quizData = await generateQuiz(text, summaryData.tldr || '');
+      console.log(`[Document ${document.id}] Quiz generated: ${quizData.length} questions`);
 
       // Generate audio from summary
-      const audioText = `Here's your summary. ${summaryData.tldr}. Key concepts include: ${summaryData.key_concepts?.join(', ') || 'various topics'}.`;
+      const audioText = `Here's your summary. ${summaryData.tldr || 'No summary available'}. Key concepts include: ${summaryData.key_concepts?.join(', ') || 'various topics'}.`;
       const audioBuffer = await generateAudio(audioText);
+      console.log(`[Document ${document.id}] Audio generated: ${audioBuffer.length} bytes`);
 
       // Upload audio to storage
       const audioFileName = `${user.id}/${document.id}-audio.mp3`;
@@ -235,13 +244,19 @@ export async function POST(request: NextRequest) {
           audio_url: audioUrl,
         });
 
-      // Save quiz
-      await supabase
+      // Save quiz (quizData is already the questions array from generateQuiz)
+      const { error: quizError } = await supabase
         .from('quizzes')
         .insert({
           document_id: document.id,
-          questions: quizData.questions,
+          questions: quizData,
         });
+      
+      if (quizError) {
+        console.error(`[Document ${document.id}] Quiz insert error:`, quizError);
+      } else {
+        console.log(`[Document ${document.id}] Quiz saved successfully`);
+      }
 
       // Generate and save flashcards
       const flashcardsData = await generateFlashcards(
@@ -249,10 +264,11 @@ export async function POST(request: NextRequest) {
         summaryData.definitions || [], 
         summaryData.key_concepts || []
       );
+      console.log(`[Document ${document.id}] Flashcards generated: ${flashcardsData.length} cards`);
 
       // Insert flashcards
       if (flashcardsData.length > 0) {
-        await supabase
+        const { error: flashcardsError } = await supabase
           .from('flashcards')
           .insert(
             flashcardsData.map((card: { front: string; back: string }) => ({
@@ -263,6 +279,12 @@ export async function POST(request: NextRequest) {
               mastery_level: 0,
             }))
           );
+        
+        if (flashcardsError) {
+          console.error(`[Document ${document.id}] Flashcards insert error:`, flashcardsError);
+        } else {
+          console.log(`[Document ${document.id}] Flashcards saved successfully`);
+        }
       }
 
       // Update document status
