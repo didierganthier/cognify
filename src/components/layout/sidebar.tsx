@@ -33,6 +33,26 @@ export function Sidebar() {
   const router = useRouter();
   const supabase = createClient();
   const [isOpen, setIsOpen] = useState(false);
+  const [isPro, setIsPro] = useState(false);
+
+  // Check subscription status
+  useEffect(() => {
+    const checkSubscription = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('subscription_status')
+          .eq('id', user.id)
+          .single();
+        
+        if (profile?.subscription_status === 'active' || profile?.subscription_status === 'lifetime') {
+          setIsPro(true);
+        }
+      }
+    };
+    checkSubscription();
+  }, [supabase]);
 
   // Close sidebar on route change
   useEffect(() => {
@@ -111,23 +131,25 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Upgrade Card */}
-      <div className="p-4">
-        <div className="rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 p-4 border border-primary/20">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-sm font-semibold">Upgrade to Pro</span>
+      {/* Upgrade Card - only show for free users */}
+      {!isPro && (
+        <div className="p-4">
+          <div className="rounded-xl bg-gradient-to-br from-primary/10 to-primary/5 p-4 border border-primary/20">
+            <div className="flex items-center gap-2 mb-2">
+              <Sparkles className="h-4 w-4 text-primary" />
+              <span className="text-sm font-semibold">Upgrade to Pro</span>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">
+              Get unlimited PDFs and audio features
+            </p>
+            <Button size="sm" variant="secondary" className="w-full text-xs" asChild>
+              <Link href="/dashboard/billing">
+                View Plans
+              </Link>
+            </Button>
           </div>
-          <p className="text-xs text-muted-foreground mb-3">
-            Get unlimited PDFs and audio features
-          </p>
-          <Button size="sm" variant="secondary" className="w-full text-xs" asChild>
-            <Link href="/dashboard/billing">
-              View Plans
-            </Link>
-          </Button>
         </div>
-      </div>
+      )}
 
       {/* Sign Out */}
       <div className="border-t p-4">
