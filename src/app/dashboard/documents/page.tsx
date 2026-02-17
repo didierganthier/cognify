@@ -9,14 +9,15 @@ import { Input } from '@/components/ui/input';
 export default async function DocumentsPage() {
   const supabase = await createClient();
   
-  // TODO: Fetch documents from Supabase
-  const documents: Array<{
-    id: string;
-    title: string;
-    status: 'processing' | 'completed' | 'failed';
-    created_at: string;
-    page_count: number;
-  }> = [];
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  const { data: documents } = await supabase
+    .from('documents')
+    .select('id, title, status, created_at, page_count')
+    .eq('user_id', user?.id)
+    .order('created_at', { ascending: false });
+
+  const documentsList = documents || [];
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -55,7 +56,7 @@ export default async function DocumentsPage() {
       </div>
 
       {/* Documents Grid */}
-      {documents.length === 0 ? (
+      {documentsList.length === 0 ? (
         <Card className="border-dashed border-2">
           <CardContent className="flex flex-col items-center justify-center py-16">
             <FileText className="h-16 w-16 text-muted-foreground/50 mb-4" />
@@ -73,7 +74,7 @@ export default async function DocumentsPage() {
         </Card>
       ) : (
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-          {documents.map((doc) => (
+          {documentsList.map((doc) => (
             <Card key={doc.id} className="hover:shadow-lg transition-shadow">
               <CardHeader>
                 <div className="flex items-start justify-between">
